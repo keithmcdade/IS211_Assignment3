@@ -1,17 +1,9 @@
 import argparse
 import csv
-import datetime
-# from datetime import datetime, timedelta
-from datetime import time
-import logging
 import shutil
 import tempfile
 import urllib.request
 import re
-import webbrowser
-from pprint import pprint
-import collections
-from itertools import groupby
 
 
 def download_data(url):
@@ -21,24 +13,12 @@ def download_data(url):
             return tmp_file.name
 
 
-class WebData:
-    def __init__(self, path, time, uagent, status, size):
-        self.path = path
-        self.time = time
-        self.uagent = uagent
-        self.status = status
-        self.size = size
-
-
 def process_data(file_contents):
     website_data = []
     with open(file_contents, newline='') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
-            # web = WebData(row[0], row[1], row[2], row[3], row[4])
             website_data.append(row[0:3:1])
-        # pprint(website_data)
-        # print(web.uagent)
         return website_data
 
 
@@ -59,7 +39,6 @@ def search_hits(website_data):
 
 def get_browser(website_data):
     browser_ls = []
-    # browser_set = []
     chrome = re.compile(r'Chrome/')
     firefox = re.compile(r'Firefox/')
     safari = re.compile(r'Version/')
@@ -72,7 +51,6 @@ def get_browser(website_data):
         current_row = website_data.pop(0)
         browser_hits = current_row.pop()
         browser_ls.append(browser_hits)
-        # browser_set = set(browser_ls)
         website_data.extend(current_row)
         if chrome.findall(browser_hits):
             count_chr += 1
@@ -86,24 +64,7 @@ def get_browser(website_data):
             continue
     browser_count = {'Chrome': count_chr, 'Firefox': count_ff, 'Safari': count_saf, 'Internet Explorer': count_ie}
     browser_max = max(browser_count, key=browser_count.get)
-    # pprint(website_data[::-1])
     return browser_max
-
-
-# def get_time(website_data):
-#     dates_list = [datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S') for date in website_data]
-#     start = datetime.datetime.fromisoformat('2014-01-27 00:00:00')
-#     end = datetime.datetime.fromisoformat('2014-01-27 23:59:59')
-#     res_time = start
-#     for i in dates_list[:]:
-#         hit = dates_list.pop(0)
-#         while hit <= end:
-#             hit += datetime.timedelta(seconds=1)
-
-
-def assignment_2():
-    logging.basicConfig(filename='error.log', filemode='w')
-    # logging.error('“Error processing line {} for ID {}”'.format(id_err, name_err))
 
 
 def main(url):
@@ -119,10 +80,8 @@ if __name__ == "__main__":
 
     csv_file = download_data(args.url)
     process_output = process_data(csv_file)
-
     hits = search_hits(process_output)
     print(f"Image requests account for {hits}% of all requests.")
     browser = get_browser(process_output)
     print(f"{browser} was the most used browser for 1/27/14.")
-    # time = get_time(process_output)
-    # pprint(time)
+
